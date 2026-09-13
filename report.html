@@ -1,4 +1,1 @@
-{% extends "base.html" %}{% block content %}<div class="formbox wide"><h2>Report {{kind}} Item</h2><form method="post" enctype="multipart/form-data">
-<input name="item_name" placeholder="Object name (e.g. Black Wallet)" required><input name="category" placeholder="Category (e.g. Wallet, Mobile, Bag)" required>
-<input name="location" placeholder="Location" required><input type="date" name="date" required><textarea name="description" placeholder="Description"></textarea>
-<label>Object image</label><input type="file" name="image" accept=".jpg,.jpeg,.png"><button>Submit Report</button></form></div>{% endblock %}
+{% extends "base.html" %}{% block content %}<div class="card"><h2>Report {{kind}} Item</h2><form method="post" enctype="multipart/form-data"><input name="item_name" placeholder="Item name" required><input name="category" placeholder="Category" required><input name="location" placeholder="Location" required><input name="date" type="date" required><textarea name="description" placeholder="Description"></textarea><input name="image" type="file" accept=".jpg,.jpeg,.png"><button>Submit {{kind}} Report</button></form></div>{% endblock %}
