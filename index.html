@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}
+<section class="hero"><div><h1>Find what you lost.</h1><p>Report lost or found belongings and use image-based matching to identify possible matches.</p>
+<a class="btn" href="/report/lost">Report Lost Item</a> <a class="btn secondary" href="/report/found">Report Found Item</a></div></section>
+<h2>Recent Lost Items</h2><div class="grid">{% for x in lost %}<div class="card">{% if x.image %}<img src="/static/uploads/{{x.image}}">{% endif %}<h3>{{x.item_name}}</h3><p>{{x.category}} • {{x.location}}</p></div>{% else %}<p>No lost items reported yet.</p>{% endfor %}</div>
+<h2>Recent Found Items</h2><div class="grid">{% for x in found %}<div class="card">{% if x.image %}<img src="/static/uploads/{{x.image}}">{% endif %}<h3>{{x.item_name}}</h3><p>{{x.category}} • {{x.location}}</p></div>{% else %}<p>No found items reported yet.</p>{% endfor %}</div>
+{% endblock %}
