@@ -1,1 +1,74 @@
-{% extends "base.html" %}{% block content %}<h1>Possible Matches</h1><div class="card"><b>{{item['item_name']}}</b> — {{item['item_type']}}</div>{% for score,c in results %}<div class="card"><h3>{{c['item_name']}}</h3><p>Match Score: <b>{{score}}%</b></p><p>Category: {{c['category']}}</p><p>Location: {{c['location']}}</p><p>{{c['description']}}</p>{% if c['image'] %}<img src="/static/uploads/{{c['image']}}" style="max-width:220px">{% endif %}</div>{% else %}<div class="card">No matching items found.</div>{% endfor %}{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Possible Matches</h1>
+
+<div class="card">
+    <b>{{ item['item_name'] }}</b> — {{ item['item_type'] }}
+</div>
+
+{% for result in results %}
+
+<div class="card">
+
+    <h3>{{ result['item']['item_name'] }}</h3>
+
+    <p>
+        Match Score:
+        <b>{{ result['score'] }}%</b>
+    </p>
+
+    <p>
+        <b>Category:</b>
+        {{ result['item']['category'] }}
+    </p>
+
+    <p>
+        <b>Colour:</b>
+        {{ result['item']['color'] or 'Not specified' }}
+    </p>
+
+    <p>
+        <b>Model Number:</b>
+        {{ result['item']['model_number'] or 'Not specified' }}
+    </p>
+
+    <p>
+        <b>Location:</b>
+        {{ result['item']['location'] }}
+    </p>
+
+    <p>
+        <b>Description:</b>
+        {{ result['item']['description'] }}
+    </p>
+
+    {% if result['reasons'] %}
+        <h4>Why this matched:</h4>
+
+        <ul>
+            {% for reason in result['reasons'] %}
+                <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if result['item']['image'] %}
+        <img
+            src="/static/uploads/{{ result['item']['image'] }}"
+            style="max-width:220px; border-radius:10px;"
+        >
+    {% endif %}
+
+</div>
+
+{% else %}
+
+<div class="card">
+    No matching items found.
+</div>
+
+{% endfor %}
+
+{% endblock %}
