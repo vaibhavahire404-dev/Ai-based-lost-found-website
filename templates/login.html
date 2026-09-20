@@ -1,1 +1,275 @@
-{% extends "base.html" %}{% block content %}<div class="card"><h2>Login</h2><form method="post"><input name="email" type="email" placeholder="Email" required><input name="password" type="password" placeholder="Password" required><button>Login</button></form><p>New user? <a href="/register">Register</a></p></div>{% endblock %}
+```html
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="login-page">
+
+    <div class="login-container">
+
+        <!-- Left Side -->
+        <div class="login-info">
+
+            <div class="ai-logo">
+                🔎
+            </div>
+
+            <p class="login-small-title">
+                AI LOST & FOUND
+            </p>
+
+            <h1>
+                Find What<br>
+                <span>Matters.</span>
+            </h1>
+
+            <p class="login-description">
+                Sign in to report lost or found items and use
+                AI-powered matching to discover possible matches.
+            </p>
+
+            <div class="login-features">
+
+                <div class="feature-item">
+                    <span>🤖</span>
+                    <div>
+                        <strong>AI Matching</strong>
+                        <small>Smart image-based matching</small>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span>🔐</span>
+                    <div>
+                        <strong>Secure Account</strong>
+                        <small>Keep your reports organized</small>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span>📱</span>
+                    <div>
+                        <strong>Easy Access</strong>
+                        <small>Use email or phone login</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Login Card -->
+        <div class="login-card">
+
+            <div class="login-heading">
+                <h2>Welcome Back 👋</h2>
+                <p>Sign in to continue to your dashboard.</p>
+            </div>
+
+
+            <!-- Google Login -->
+            <button type="button" class="social-login google-login"
+                    onclick="googleLogin()">
+                <span class="google-icon">G</span>
+                <span>Continue with Google</span>
+            </button>
+
+
+            <!-- Phone Login -->
+            <button type="button" class="social-login phone-login"
+                    onclick="phoneLogin()">
+                <span>📱</span>
+                <span>Continue with Phone Number</span>
+            </button>
+
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+
+            <!-- Email Login -->
+            <form method="post" class="login-form">
+
+                <label>Email Address</label>
+
+                <input
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+
+
+                <div class="password-label">
+
+                    <label>Password</label>
+
+                    <a href="#" onclick="forgotPassword(event)">
+                        Forgot password?
+                    </a>
+
+                </div>
+
+                <input
+                    name="password"
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <label class="remember-me">
+                    <input type="checkbox">
+                    <span>Remember me</span>
+                </label>
+
+
+                <button type="submit" class="login-button">
+                    Login
+                    <span>→</span>
+                </button>
+
+            </form>
+
+
+            <div class="register-text">
+                New user?
+                <a href="/register">Create an account</a>
+            </div>
+
+            <p class="login-security">
+                🔒 Your account information is protected.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Phone Login Modal -->
+<div class="login-modal" id="phoneModal">
+
+    <div class="modal-box">
+
+        <button class="modal-close" onclick="closePhoneModal()">
+            ×
+        </button>
+
+        <div class="modal-icon">
+            📱
+        </div>
+
+        <h2>Login with Phone</h2>
+
+        <p>
+            Enter your mobile number to receive an OTP.
+        </p>
+
+        <div class="phone-input">
+
+            <span>+91</span>
+
+            <input
+                type="tel"
+                id="phoneNumber"
+                placeholder="Enter mobile number"
+                maxlength="10"
+            >
+
+        </div>
+
+        <button class="otp-button" onclick="sendOTP()">
+            Send OTP
+        </button>
+
+        <div id="otpSection" class="otp-section">
+
+            <label>Enter OTP</label>
+
+            <input
+                type="text"
+                id="otp"
+                placeholder="6-digit OTP"
+                maxlength="6"
+            >
+
+            <button class="verify-button" onclick="verifyOTP()">
+                Verify OTP
+            </button>
+
+        </div>
+
+        <small class="demo-note">
+            Phone OTP authentication will be connected in the next step.
+        </small>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function phoneLogin() {
+    document.getElementById("phoneModal").classList.add("show");
+}
+
+function closePhoneModal() {
+    document.getElementById("phoneModal").classList.remove("show");
+}
+
+function sendOTP() {
+
+    const phone = document.getElementById("phoneNumber").value.trim();
+
+    if (phone.length !== 10) {
+        alert("Please enter a valid 10-digit mobile number.");
+        return;
+    }
+
+    document.getElementById("otpSection").classList.add("show");
+
+    alert("OTP screen opened. Actual OTP service will be connected next.");
+}
+
+function verifyOTP() {
+
+    const otp = document.getElementById("otp").value.trim();
+
+    if (otp.length !== 6) {
+        alert("Please enter a valid 6-digit OTP.");
+        return;
+    }
+
+    alert("OTP verification will be connected to the authentication service next.");
+}
+
+function googleLogin() {
+
+    alert(
+        "Google Login UI is ready. Actual Google authentication will be connected next."
+    );
+
+}
+
+function forgotPassword(event) {
+
+    event.preventDefault();
+
+    alert(
+        "Password recovery will be connected in the next authentication step."
+    );
+
+}
+
+</script>
+
+{% endblock %}
+```
