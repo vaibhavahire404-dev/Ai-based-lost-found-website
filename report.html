@@ -1,1 +1,65 @@
-{% extends "base.html" %}{% block content %}<div class="card"><h2>Report {{kind}} Item</h2><form method="post" enctype="multipart/form-data"><input name="item_name" placeholder="Item name" required><input name="category" placeholder="Category" required><input name="location" placeholder="Location" required><input name="date" type="date" required><textarea name="description" placeholder="Description"></textarea><input name="image" type="file" accept=".jpg,.jpeg,.png"><button>Submit {{kind}} Report</button></form></div>{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h2>Report {{ kind }} Item</h2>
+
+    <form method="post" enctype="multipart/form-data">
+
+        <input
+            name="item_name"
+            placeholder="Item name"
+            required
+        >
+
+        <input
+            name="category"
+            placeholder="Category"
+            required
+        >
+
+        <input
+            name="color"
+            placeholder="Colour"
+            required
+        >
+
+        <input
+            name="model_number"
+            placeholder="Model number"
+        >
+
+        <input
+            name="location"
+            placeholder="Location"
+            required
+        >
+
+        <input
+            name="date"
+            type="date"
+            required
+        >
+
+        <textarea
+            name="description"
+            placeholder="Description"
+        ></textarea>
+
+        <input
+            name="image"
+            type="file"
+            accept=".jpg,.jpeg,.png"
+        >
+
+        <button type="submit">
+            Submit {{ kind }} Report
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
