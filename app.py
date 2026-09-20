@@ -3,17 +3,29 @@ import sqlite3
 import os
 import uuid
 import cv2
+
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
 
+
+# ============================================================
+# APP CONFIGURATION
+# ============================================================
+
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
+
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "change-this-secret-key"
+)
+
+oauth = OAuth(app)
+
 
 # ============================================================
 # GOOGLE OAUTH
 # ============================================================
-
-oauth = OAuth(app)
 
 google = oauth.register(
     name="google",
@@ -25,8 +37,9 @@ google = oauth.register(
     }
 )
 
+
 # ============================================================
-# SETTINGS
+# PATHS
 # ============================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,17 +55,21 @@ UPLOAD_DIR = os.path.join(
     "uploads"
 )
 
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(
+    UPLOAD_DIR,
+    exist_ok=True
+)
 
-ALLOWED = {
-    "png",
+
+ALLOWED_EXTENSIONS = {
     "jpg",
-    "jpeg"
+    "jpeg",
+    "png"
 }
 
 
 # ============================================================
-# DATABASE CONNECTION
+# DATABASE
 # ============================================================
 
 def db():
@@ -60,10 +77,6 @@ def db():
     con.row_factory = sqlite3.Row
     return con
 
-
-# ============================================================
-# DATABASE INITIALIZATION
-# ============================================================
 
 def init_db():
 
@@ -105,7 +118,6 @@ def init_db():
 
     """)
 
-    # Existing database migration
     columns = [
         row["name"]
         for row in con.execute(
@@ -128,19 +140,31 @@ def init_db():
 
 
 # ============================================================
-# FILE VALIDATION
+# HELPERS
 # ============================================================
 
-def allowed(filename):
+def allowed_file(filename):
 
     return (
         "." in filename
-        and filename.rsplit(".", 1)[1].lower() in ALLOWED
+        and filename.rsplit(
+            ".",
+            1
+        )[1].lower() in ALLOWED_EXTENSIONS
+    )
+
+
+def normalize(value):
+
+    return (
+        str(value or "")
+        .strip()
+        .lower()
     )
 
 
 # ============================================================
-# IMAGE SIMILARITY - OPENCV ORB
+# IMAGE MATCHING
 # ============================================================
 
 def image_similarity(path1, path2):
@@ -170,20 +194,20 @@ def image_similarity(path1, path2):
             return 0.0
 
         orb = cv2.ORB_create(
-            nfeatures=800
+            nfeatures=1000
         )
 
-        keypoints1, descriptors1 = orb.detectAndCompute(
+        kp1, des1 = orb.detectAndCompute(
             img1,
             None
         )
 
-        keypoints2, descriptors2 = orb.detectAndCompute(
+        kp2, des2 = orb.detectAndCompute(
             img2,
             None
         )
 
-        if descriptors1 is None or descriptors2 is None:
+        if des1 is None or des2 is None:
             return 0.0
 
         matcher = cv2.BFMatcher(
@@ -192,32 +216,36 @@ def image_similarity(path1, path2):
         )
 
         matches = matcher.match(
-            descriptors1,
-            descriptors2
+            des1,
+            des2
         )
 
         if not matches:
             return 0.0
 
-        good_matches = [
-            m for m in matches
+        good = [
+            m
+            for m in matches
             if m.distance < 65
         ]
 
-        score = (
-            len(good_matches)
-            /
-            max(
-                12,
-                min(
-                    len(keypoints1),
-                    len(keypoints2)
-                )
+        base = max(
+            12,
+            min(
+                len(kp1),
+                len(kp2)
             )
+        )
+
+        score = (
+            len(good) / base
         ) * 100
 
         return round(
-            min(100.0, score),
+            min(
+                100.0,
+                score
+            ),
             2
         )
 
@@ -240,23 +268,19 @@ def home():
 
     con = db()
 
-    lost = con.execute(
-        """
+    lost = con.execute("""
         SELECT *
         FROM items
         WHERE item_type='Lost'
         ORDER BY id DESC
-        """
-    ).fetchall()
+    """).fetchall()
 
-    found = con.execute(
-        """
+    found = con.execute("""
         SELECT *
         FROM items
         WHERE item_type='Found'
         ORDER BY id DESC
-        """
-    ).fetchall()
+    """).fetchall()
 
     con.close()
 
@@ -304,25 +328,36 @@ def register():
                 url_for("register")
             )
 
+        if len(password) < 6:
+
+            flash(
+                "Password must contain at least 6 characters."
+            )
+
+            return redirect(
+                url_for("register")
+            )
+
         try:
 
             con = db()
 
-            con.execute(
-                """
+            hashed_password = generate_password_hash(
+                password
+            )
+
+            con.execute("""
                 INSERT INTO users(
                     name,
                     email,
                     password
                 )
                 VALUES(?,?,?)
-                """,
-                (
-                    name,
-                    email,
-                    password
-                )
-            )
+            """, (
+                name,
+                email,
+                hashed_password
+            ))
 
             con.commit()
             con.close()
@@ -339,6 +374,10 @@ def register():
 
             flash(
                 "Email already registered."
+            )
+
+            return redirect(
+                url_for("register")
             )
 
     return render_template(
@@ -370,29 +409,55 @@ def login():
 
         con = db()
 
-        user = con.execute(
-            """
+        user = con.execute("""
             SELECT *
             FROM users
             WHERE email=?
-            AND password=?
-            """,
-            (
-                email,
-                password
-            )
-        ).fetchone()
+        """, (
+            email,
+        )).fetchone()
 
         con.close()
 
         if user:
 
-            session["uid"] = user["id"]
-            session["name"] = user["name"]
+            password_ok = False
 
-            return redirect(
-                url_for("dashboard")
-            )
+            try:
+                password_ok = check_password_hash(
+                    user["password"],
+                    password
+                )
+            except Exception:
+                password_ok = False
+
+            # Compatibility with old plain-text accounts
+            if not password_ok and user["password"] == password:
+
+                password_ok = True
+
+                con = db()
+
+                con.execute("""
+                    UPDATE users
+                    SET password=?
+                    WHERE id=?
+                """, (
+                    generate_password_hash(password),
+                    user["id"]
+                ))
+
+                con.commit()
+                con.close()
+
+            if password_ok:
+
+                session["uid"] = user["id"]
+                session["name"] = user["name"]
+
+                return redirect(
+                    url_for("dashboard")
+                )
 
         flash(
             "Invalid email or password."
@@ -412,6 +477,10 @@ def logout():
 
     session.clear()
 
+    flash(
+        "You have been logged out."
+    )
+
     return redirect(
         url_for("home")
     )
@@ -423,6 +492,20 @@ def logout():
 
 @app.route("/login/google")
 def login_google():
+
+    if not os.environ.get(
+        "GOOGLE_CLIENT_ID"
+    ) or not os.environ.get(
+        "GOOGLE_CLIENT_SECRET"
+    ):
+
+        flash(
+            "Google Login is not configured."
+        )
+
+        return redirect(
+            url_for("login")
+        )
 
     redirect_uri = url_for(
         "google_callback",
@@ -441,19 +524,26 @@ def google_callback():
 
         token = google.authorize_access_token()
 
-        userinfo = token.get("userinfo")
+        userinfo = token.get(
+            "userinfo"
+        )
 
         if not userinfo:
+
             userinfo = google.userinfo()
 
-        email = userinfo.get(
-            "email",
-            ""
-        ).lower()
+        email = normalize(
+            userinfo.get(
+                "email",
+                ""
+            )
+        )
 
-        name = userinfo.get(
-            "name",
-            ""
+        name = (
+            userinfo.get(
+                "name",
+                ""
+            ).strip()
         )
 
         if not name:
@@ -471,50 +561,51 @@ def google_callback():
 
         con = db()
 
-        user = con.execute(
-            """
+        user = con.execute("""
             SELECT *
             FROM users
             WHERE email=?
-            """,
-            (email,)
-        ).fetchone()
+        """, (
+            email,
+        )).fetchone()
 
         if not user:
 
             random_password = uuid.uuid4().hex
 
-            con.execute(
-                """
+            con.execute("""
                 INSERT INTO users(
                     name,
                     email,
                     password
                 )
                 VALUES(?,?,?)
-                """,
-                (
-                    name,
-                    email,
+            """, (
+                name,
+                email,
+                generate_password_hash(
                     random_password
                 )
-            )
+            ))
 
             con.commit()
 
-            user = con.execute(
-                """
+            user = con.execute("""
                 SELECT *
                 FROM users
                 WHERE email=?
-                """,
-                (email,)
-            ).fetchone()
+            """, (
+                email,
+            )).fetchone()
 
         con.close()
 
         session["uid"] = user["id"]
         session["name"] = user["name"]
+
+        flash(
+            "Google login successful."
+        )
 
         return redirect(
             url_for("dashboard")
@@ -537,7 +628,7 @@ def google_callback():
 
 
 # ============================================================
-# LOST / FOUND REPORT
+# REPORT LOST / FOUND
 # ============================================================
 
 @app.route(
@@ -547,6 +638,10 @@ def google_callback():
 def report(kind):
 
     if "uid" not in session:
+
+        flash(
+            "Please login first."
+        )
 
         return redirect(
             url_for("login")
@@ -562,10 +657,6 @@ def report(kind):
         )
 
     if request.method == "POST":
-
-        # ----------------------------------------------------
-        # GET FORM DATA SAFELY
-        # ----------------------------------------------------
 
         item_name = request.form.get(
             "item_name",
@@ -602,10 +693,6 @@ def report(kind):
             ""
         ).strip()
 
-        # ----------------------------------------------------
-        # VALIDATION
-        # ----------------------------------------------------
-
         if not item_name:
             flash("Please enter item name.")
             return redirect(request.url)
@@ -626,11 +713,13 @@ def report(kind):
             flash("Please select date.")
             return redirect(request.url)
 
-        # ----------------------------------------------------
-        # IMAGE
-        # ----------------------------------------------------
+        if not description:
+            flash("Please enter description.")
+            return redirect(request.url)
 
-        image = request.files.get("image")
+        image = request.files.get(
+            "image"
+        )
 
         filename = ""
 
@@ -640,7 +729,9 @@ def report(kind):
                 image.filename
             )
 
-            if not allowed(safe_name):
+            if not allowed_file(
+                safe_name
+            ):
 
                 flash(
                     "Only JPG, JPEG and PNG images are allowed."
@@ -668,16 +759,11 @@ def report(kind):
                 )
             )
 
-        # ----------------------------------------------------
-        # SAVE REPORT
-        # ----------------------------------------------------
-
         try:
 
             con = db()
 
-            con.execute(
-                """
+            con.execute("""
                 INSERT INTO items(
                     user_id,
                     item_type,
@@ -688,23 +774,23 @@ def report(kind):
                     location,
                     date,
                     description,
-                    image
+                    image,
+                    status
                 )
-                VALUES(?,?,?,?,?,?,?,?,?,?)
-                """,
-                (
-                    session["uid"],
-                    kind.title(),
-                    item_name,
-                    category,
-                    color,
-                    model_number,
-                    location,
-                    date,
-                    description,
-                    filename
-                )
-            )
+                VALUES(?,?,?,?,?,?,?,?,?,?,?)
+            """, (
+                session["uid"],
+                kind.title(),
+                item_name,
+                category,
+                color,
+                model_number,
+                location,
+                date,
+                description,
+                filename,
+                "Active"
+            ))
 
             con.commit()
             con.close()
@@ -725,7 +811,7 @@ def report(kind):
             )
 
             flash(
-                "Unable to save report. Please try again."
+                "Unable to save report."
             )
 
             return redirect(
@@ -753,23 +839,37 @@ def dashboard():
 
     con = db()
 
-    items = con.execute(
-        """
+    items = con.execute("""
         SELECT *
         FROM items
         WHERE user_id=?
         ORDER BY id DESC
-        """,
-        (
-            session["uid"],
-        )
-    ).fetchall()
+    """, (
+        session["uid"],
+    )).fetchall()
+
+    total = len(items)
+
+    lost_count = sum(
+        1
+        for item in items
+        if item["item_type"] == "Lost"
+    )
+
+    found_count = sum(
+        1
+        for item in items
+        if item["item_type"] == "Found"
+    )
 
     con.close()
 
     return render_template(
         "dashboard.html",
-        items=items
+        items=items,
+        total=total,
+        lost_count=lost_count,
+        found_count=found_count
     )
 
 
@@ -784,18 +884,21 @@ def matches(item_id):
 
     con = db()
 
-    item = con.execute(
-        """
+    item = con.execute("""
         SELECT *
         FROM items
         WHERE id=?
-        """,
-        (item_id,)
-    ).fetchone()
+    """, (
+        item_id,
+    )).fetchone()
 
     if not item:
 
         con.close()
+
+        flash(
+            "Item not found."
+        )
 
         return redirect(
             url_for("home")
@@ -807,31 +910,26 @@ def matches(item_id):
         else "Lost"
     )
 
-    candidates = con.execute(
-        """
+    candidates = con.execute("""
         SELECT *
         FROM items
         WHERE item_type=?
         AND status='Active'
         AND id != ?
-        """,
-        (
-            opposite_type,
-            item_id
-        )
-    ).fetchall()
+        ORDER BY id DESC
+    """, (
+        opposite_type,
+        item_id
+    )).fetchall()
 
     results = []
 
     for candidate in candidates:
 
         score = 0.0
-
         reasons = []
 
-        # IMAGE - 55%
-        image_score = 0.0
-
+        # IMAGE 55%
         if (
             item["image"]
             and candidate["image"]
@@ -853,89 +951,98 @@ def matches(item_id):
             if image_score >= 20:
 
                 reasons.append(
-                    "Image"
+                    f"Image similarity ({image_score}%)"
                 )
 
-        # MODEL NUMBER - 20%
-        if (
+        # MODEL NUMBER 20%
+        model1 = normalize(
             item["model_number"]
-            and candidate["model_number"]
-        ):
+        )
 
-            model1 = item["model_number"].strip().lower()
-            model2 = candidate["model_number"].strip().lower()
+        model2 = normalize(
+            candidate["model_number"]
+        )
+
+        if model1 and model2:
 
             if model1 == model2:
 
                 score += 20
 
                 reasons.append(
-                    "Model Number"
+                    "Model Number matches"
                 )
 
-        # COLOUR - 10%
-        if (
+        # COLOUR 10%
+        color1 = normalize(
             item["color"]
-            and candidate["color"]
-        ):
+        )
 
-            color1 = item["color"].strip().lower()
-            color2 = candidate["color"].strip().lower()
+        color2 = normalize(
+            candidate["color"]
+        )
+
+        if color1 and color2:
 
             if color1 == color2:
 
                 score += 10
 
                 reasons.append(
-                    "Colour"
+                    "Colour matches"
                 )
 
-        # CATEGORY - 8%
-        if (
+        # CATEGORY 8%
+        category1 = normalize(
             item["category"]
-            and candidate["category"]
-        ):
+        )
 
-            category1 = item["category"].strip().lower()
-            category2 = candidate["category"].strip().lower()
+        category2 = normalize(
+            candidate["category"]
+        )
+
+        if category1 and category2:
 
             if category1 == category2:
 
                 score += 8
 
                 reasons.append(
-                    "Category"
+                    "Category matches"
                 )
 
-        # LOCATION - 7%
-        if (
+        # LOCATION 7%
+        location1 = normalize(
             item["location"]
-            and candidate["location"]
-        ):
+        )
 
-            location1 = item["location"].strip().lower()
-            location2 = candidate["location"].strip().lower()
+        location2 = normalize(
+            candidate["location"]
+        )
+
+        if location1 and location2:
 
             if location1 == location2:
 
                 score += 7
 
                 reasons.append(
-                    "Location"
+                    "Location matches"
                 )
 
         score = min(
             100,
-            round(score, 2)
+            round(
+                score,
+                2
+            )
         )
 
-        results.append(
-            {
-                "score": score,
-                "item": candidate,
-                "reasons": reasons
-            }
-        )
+        results.append({
+            "score": score,
+            "item": candidate,
+            "reasons": reasons
+        })
 
     results.sort(
         key=lambda x: x["score"],
@@ -965,25 +1072,36 @@ def search():
 
     con = db()
 
-    rows = con.execute(
-        """
-        SELECT *
-        FROM items
-        WHERE item_name LIKE ?
-        OR category LIKE ?
-        OR color LIKE ?
-        OR model_number LIKE ?
-        OR location LIKE ?
-        ORDER BY id DESC
-        """,
-        (
-            f"%{q}%",
-            f"%{q}%",
-            f"%{q}%",
-            f"%{q}%",
-            f"%{q}%"
-        )
-    ).fetchall()
+    if q:
+
+        search_value = f"%{q}%"
+
+        rows = con.execute("""
+            SELECT *
+            FROM items
+            WHERE item_name LIKE ?
+            OR category LIKE ?
+            OR color LIKE ?
+            OR model_number LIKE ?
+            OR location LIKE ?
+            OR description LIKE ?
+            ORDER BY id DESC
+        """, (
+            search_value,
+            search_value,
+            search_value,
+            search_value,
+            search_value,
+            search_value
+        )).fetchall()
+
+    else:
+
+        rows = con.execute("""
+            SELECT *
+            FROM items
+            ORDER BY id DESC
+        """).fetchall()
 
     con.close()
 
@@ -1001,37 +1119,35 @@ def search():
 @app.route("/admin")
 def admin():
 
+    if "uid" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
     con = db()
 
-    users = con.execute(
-        """
+    users = con.execute("""
         SELECT COUNT(*) AS c
         FROM users
-        """
-    ).fetchone()["c"]
+    """).fetchone()["c"]
 
-    items = con.execute(
-        """
+    items = con.execute("""
         SELECT COUNT(*) AS c
         FROM items
-        """
-    ).fetchone()["c"]
+    """).fetchone()["c"]
 
-    lost = con.execute(
-        """
+    lost = con.execute("""
         SELECT COUNT(*) AS c
         FROM items
         WHERE item_type='Lost'
-        """
-    ).fetchone()["c"]
+    """).fetchone()["c"]
 
-    found = con.execute(
-        """
+    found = con.execute("""
         SELECT COUNT(*) AS c
         FROM items
         WHERE item_type='Found'
-        """
-    ).fetchone()["c"]
+    """).fetchone()["c"]
 
     con.close()
 
@@ -1045,7 +1161,7 @@ def admin():
 
 
 # ============================================================
-# DATABASE START
+# START DATABASE
 # ============================================================
 
 init_db()
@@ -1067,4 +1183,3 @@ if __name__ == "__main__":
         ),
         debug=True
     )
-    
