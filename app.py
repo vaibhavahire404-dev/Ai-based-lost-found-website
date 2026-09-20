@@ -42,10 +42,7 @@ UPLOAD_DIR = os.path.join(
     "uploads"
 )
 
-os.makedirs(
-    UPLOAD_DIR,
-    exist_ok=True
-)
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 ALLOWED = {
     "png",
@@ -59,11 +56,8 @@ ALLOWED = {
 # ============================================================
 
 def db():
-
     con = sqlite3.connect(DB)
-
     con.row_factory = sqlite3.Row
-
     return con
 
 
@@ -120,19 +114,16 @@ def init_db():
     ]
 
     if "color" not in columns:
-
         con.execute(
             "ALTER TABLE items ADD COLUMN color TEXT"
         )
 
     if "model_number" not in columns:
-
         con.execute(
             "ALTER TABLE items ADD COLUMN model_number TEXT"
         )
 
     con.commit()
-
     con.close()
 
 
@@ -144,10 +135,7 @@ def allowed(filename):
 
     return (
         "." in filename
-        and filename.rsplit(
-            ".",
-            1
-        )[1].lower() in ALLOWED
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED
     )
 
 
@@ -229,10 +217,7 @@ def image_similarity(path1, path2):
         ) * 100
 
         return round(
-            min(
-                100.0,
-                score
-            ),
+            min(100.0, score),
             2
         )
 
@@ -309,6 +294,16 @@ def register():
             ""
         )
 
+        if not name or not email or not password:
+
+            flash(
+                "Please fill all required fields."
+            )
+
+            return redirect(
+                url_for("register")
+            )
+
         try:
 
             con = db()
@@ -330,7 +325,6 @@ def register():
             )
 
             con.commit()
-
             con.close()
 
             flash(
@@ -394,7 +388,6 @@ def login():
         if user:
 
             session["uid"] = user["id"]
-
             session["name"] = user["name"]
 
             return redirect(
@@ -448,12 +441,9 @@ def google_callback():
 
         token = google.authorize_access_token()
 
-        userinfo = token.get(
-            "userinfo"
-        )
+        userinfo = token.get("userinfo")
 
         if not userinfo:
-
             userinfo = google.userinfo()
 
         email = userinfo.get(
@@ -467,7 +457,6 @@ def google_callback():
         )
 
         if not name:
-
             name = email.split("@")[0]
 
         if not email:
@@ -525,7 +514,6 @@ def google_callback():
         con.close()
 
         session["uid"] = user["id"]
-
         session["name"] = user["name"]
 
         return redirect(
@@ -575,6 +563,10 @@ def report(kind):
 
     if request.method == "POST":
 
+        # ----------------------------------------------------
+        # GET FORM DATA SAFELY
+        # ----------------------------------------------------
+
         item_name = request.form.get(
             "item_name",
             ""
@@ -610,9 +602,35 @@ def report(kind):
             ""
         ).strip()
 
-        image = request.files.get(
-            "image"
-        )
+        # ----------------------------------------------------
+        # VALIDATION
+        # ----------------------------------------------------
+
+        if not item_name:
+            flash("Please enter item name.")
+            return redirect(request.url)
+
+        if not category:
+            flash("Please enter category.")
+            return redirect(request.url)
+
+        if not color:
+            flash("Please enter colour.")
+            return redirect(request.url)
+
+        if not location:
+            flash("Please enter location.")
+            return redirect(request.url)
+
+        if not date:
+            flash("Please select date.")
+            return redirect(request.url)
+
+        # ----------------------------------------------------
+        # IMAGE
+        # ----------------------------------------------------
+
+        image = request.files.get("image")
 
         filename = ""
 
@@ -650,49 +668,69 @@ def report(kind):
                 )
             )
 
-        con = db()
+        # ----------------------------------------------------
+        # SAVE REPORT
+        # ----------------------------------------------------
 
-        con.execute(
-            """
-            INSERT INTO items(
-                user_id,
-                item_type,
-                item_name,
-                category,
-                color,
-                model_number,
-                location,
-                date,
-                description,
-                image
+        try:
+
+            con = db()
+
+            con.execute(
+                """
+                INSERT INTO items(
+                    user_id,
+                    item_type,
+                    item_name,
+                    category,
+                    color,
+                    model_number,
+                    location,
+                    date,
+                    description,
+                    image
+                )
+                VALUES(?,?,?,?,?,?,?,?,?,?)
+                """,
+                (
+                    session["uid"],
+                    kind.title(),
+                    item_name,
+                    category,
+                    color,
+                    model_number,
+                    location,
+                    date,
+                    description,
+                    filename
+                )
             )
-            VALUES(?,?,?,?,?,?,?,?,?,?)
-            """,
-            (
-                session["uid"],
-                kind.title(),
-                item_name,
-                category,
-                color,
-                model_number,
-                location,
-                date,
-                description,
-                filename
+
+            con.commit()
+            con.close()
+
+            flash(
+                f"{kind.title()} item reported successfully."
             )
-        )
 
-        con.commit()
+            return redirect(
+                url_for("dashboard")
+            )
 
-        con.close()
+        except Exception as e:
 
-        flash(
-            f"{kind.title()} item reported successfully."
-        )
+            print(
+                "Report Save Error:",
+                e
+            )
 
-        return redirect(
-            url_for("dashboard")
-        )
+            flash(
+                "Unable to save report. Please try again."
+            )
+
+            return redirect(
+                request.url
+            )
 
     return render_template(
         "report.html",
@@ -791,11 +829,7 @@ def matches(item_id):
 
         reasons = []
 
-        # ----------------------------------------------------
-        # IMAGE
-        # Maximum contribution = 55
-        # ----------------------------------------------------
-
+        # IMAGE - 55%
         image_score = 0.0
 
         if (
@@ -814,9 +848,7 @@ def matches(item_id):
                 )
             )
 
-            score += (
-                image_score * 0.55
-            )
+            score += image_score * 0.55
 
             if image_score >= 20:
 
@@ -824,27 +856,14 @@ def matches(item_id):
                     "Image"
                 )
 
-        # ----------------------------------------------------
-        # MODEL NUMBER
-        # 20 points
-        # ----------------------------------------------------
-
+        # MODEL NUMBER - 20%
         if (
             item["model_number"]
             and candidate["model_number"]
         ):
 
-            model1 = (
-                item["model_number"]
-                .strip()
-                .lower()
-            )
-
-            model2 = (
-                candidate["model_number"]
-                .strip()
-                .lower()
-            )
+            model1 = item["model_number"].strip().lower()
+            model2 = candidate["model_number"].strip().lower()
 
             if model1 == model2:
 
@@ -854,27 +873,14 @@ def matches(item_id):
                     "Model Number"
                 )
 
-        # ----------------------------------------------------
-        # COLOUR
-        # 10 points
-        # ----------------------------------------------------
-
+        # COLOUR - 10%
         if (
             item["color"]
             and candidate["color"]
         ):
 
-            color1 = (
-                item["color"]
-                .strip()
-                .lower()
-            )
-
-            color2 = (
-                candidate["color"]
-                .strip()
-                .lower()
-            )
+            color1 = item["color"].strip().lower()
+            color2 = candidate["color"].strip().lower()
 
             if color1 == color2:
 
@@ -884,27 +890,14 @@ def matches(item_id):
                     "Colour"
                 )
 
-        # ----------------------------------------------------
-        # CATEGORY
-        # 8 points
-        # ----------------------------------------------------
-
+        # CATEGORY - 8%
         if (
             item["category"]
             and candidate["category"]
         ):
 
-            category1 = (
-                item["category"]
-                .strip()
-                .lower()
-            )
-
-            category2 = (
-                candidate["category"]
-                .strip()
-                .lower()
-            )
+            category1 = item["category"].strip().lower()
+            category2 = candidate["category"].strip().lower()
 
             if category1 == category2:
 
@@ -914,27 +907,14 @@ def matches(item_id):
                     "Category"
                 )
 
-        # ----------------------------------------------------
-        # LOCATION
-        # 7 points
-        # ----------------------------------------------------
-
+        # LOCATION - 7%
         if (
             item["location"]
             and candidate["location"]
         ):
 
-            location1 = (
-                item["location"]
-                .strip()
-                .lower()
-            )
-
-            location2 = (
-                candidate["location"]
-                .strip()
-                .lower()
-            )
+            location1 = item["location"].strip().lower()
+            location2 = candidate["location"].strip().lower()
 
             if location1 == location2:
 
@@ -946,10 +926,7 @@ def matches(item_id):
 
         score = min(
             100,
-            round(
-                score,
-                2
-            )
+            round(score, 2)
         )
 
         results.append(
@@ -1068,7 +1045,7 @@ def admin():
 
 
 # ============================================================
-# START DATABASE
+# DATABASE START
 # ============================================================
 
 init_db()
@@ -1087,5 +1064,7 @@ if __name__ == "__main__":
                 "PORT",
                 5000
             )
-        )
+        ),
+        debug=True
     )
+    
