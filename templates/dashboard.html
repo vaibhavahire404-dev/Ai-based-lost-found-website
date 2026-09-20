@@ -1,1 +1,222 @@
-{% extends "base.html" %}`n{% block content %}`n<h1>Dashboard</h1>`n<div class="grid">`n{% for x in items %}`n<div class="card">`n<h3>{{x["item_name"]}}</h3>`n<b>{{x["item_type"]}}</b>`n<p>{{x["category"]}} | {{x["location"]}}</p>`n<p>{{x["description"]}}</p>`n<a href="/matches/{{x["id"]}}">Find Matches</a>`n</div>`n{% else %}`n<p>No reports yet.</p>`n{% endfor %}`n</div>`n{% endblock %}
+```html
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- Welcome Header -->
+    <section class="dashboard-header">
+        <div>
+            <p class="dashboard-label">AI LOST & FOUND</p>
+            <h1>Welcome, {{ session["name"] }} 👋</h1>
+            <p class="dashboard-subtitle">
+                Manage your lost and found reports and discover possible matches.
+            </p>
+        </div>
+
+        <div class="header-actions">
+            <a href="/report/lost" class="btn btn-lost">
+                + Report Lost
+            </a>
+
+            <a href="/report/found" class="btn btn-found">
+                + Report Found
+            </a>
+        </div>
+    </section>
+
+
+    <!-- Statistics -->
+    <section class="stats-grid">
+
+        <div class="stat-card total-card">
+            <div class="stat-icon">📋</div>
+            <div>
+                <span>Total Reports</span>
+                <strong>{{ items|length }}</strong>
+            </div>
+        </div>
+
+        <div class="stat-card lost-card">
+            <div class="stat-icon">🔴</div>
+            <div>
+                <span>Lost Items</span>
+                <strong>
+                    {{ items|selectattr("item_type", "equalto", "Lost")|list|length }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="stat-card found-card">
+            <div class="stat-icon">🟢</div>
+            <div>
+                <span>Found Items</span>
+                <strong>
+                    {{ items|selectattr("item_type", "equalto", "Found")|list|length }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="stat-card ai-card">
+            <div class="stat-icon">🤖</div>
+            <div>
+                <span>AI Matching</span>
+                <strong>ON</strong>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- Reports Section -->
+    <section class="reports-section">
+
+        <div class="section-heading">
+            <div>
+                <p class="section-label">MY ACTIVITY</p>
+                <h2>Your Reports</h2>
+            </div>
+
+            <span class="report-count">
+                {{ items|length }} Report{% if items|length != 1 %}s{% endif %}
+            </span>
+        </div>
+
+
+        {% if items %}
+
+        <div class="reports-grid">
+
+            {% for x in items %}
+
+            <article class="report-card">
+
+                <div class="report-top">
+
+                    <span class="type-badge
+                        {% if x['item_type'] == 'Lost' %}
+                            badge-lost
+                        {% else %}
+                            badge-found
+                        {% endif %}
+                    ">
+                        {% if x['item_type'] == 'Lost' %}
+                            🔴 Lost
+                        {% else %}
+                            🟢 Found
+                        {% endif %}
+                    </span>
+
+                    <span class="status-badge">
+                        {{ x["status"] or "Active" }}
+                    </span>
+
+                </div>
+
+
+                <!-- Image -->
+                {% if x["image"] %}
+
+                <div class="report-image">
+                    <img
+                        src="{{ url_for('static', filename='uploads/' + x['image']) }}"
+                        alt="{{ x['item_name'] }}"
+                    >
+                </div>
+
+                {% else %}
+
+                <div class="report-image no-image">
+                    <span>📦</span>
+                    <small>No image uploaded</small>
+                </div>
+
+                {% endif %}
+
+
+                <!-- Details -->
+                <div class="report-content">
+
+                    <h3>{{ x["item_name"] }}</h3>
+
+                    <div class="detail-row">
+                        <span>🏷️ Category</span>
+                        <strong>{{ x["category"] or "Not specified" }}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>📍 Location</span>
+                        <strong>{{ x["location"] or "Not specified" }}</strong>
+                    </div>
+
+                    <div class="detail-row">
+                        <span>📅 Date</span>
+                        <strong>{{ x["date"] or "Not specified" }}</strong>
+                    </div>
+
+                    {% if x["description"] %}
+                    <p class="description">
+                        {{ x["description"] }}
+                    </p>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- Actions -->
+                <div class="report-actions">
+
+                    <a
+                        href="{{ url_for('matches', item_id=x['id']) }}"
+                        class="match-btn"
+                    >
+                        🤖 Find AI Matches
+                    </a>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <!-- Empty State -->
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                🔎
+            </div>
+
+            <h2>No Reports Yet</h2>
+
+            <p>
+                You haven't reported any lost or found items.
+                Start by creating your first report.
+            </p>
+
+            <div class="empty-actions">
+
+                <a href="/report/lost" class="btn btn-lost">
+                    Report Lost Item
+                </a>
+
+                <a href="/report/found" class="btn btn-found">
+                    Report Found Item
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}
+```
