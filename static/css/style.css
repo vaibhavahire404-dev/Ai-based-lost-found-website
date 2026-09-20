@@ -1,1 +1,623 @@
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#182230}nav{display:flex;justify-content:space-between;align-items:center;padding:18px 7%;background:#172554;color:white}nav a{color:white;text-decoration:none;margin-left:22px}.brand{font-weight:700;margin-left:0}.hero{margin:35px auto;padding:55px;max-width:1100px;border-radius:24px;background:white;box-shadow:0 10px 30px #00000010}.hero h1{font-size:46px;margin:8px 0}.tag{font-size:13px;font-weight:bold;letter-spacing:2px}.btn,button{display:inline-block;border:0;border-radius:10px;padding:12px 18px;background:#172554;color:white;text-decoration:none;cursor:pointer}.toolbar,main{max-width:1100px;margin:auto}.toolbar form{display:flex;gap:10px;margin:20px 0}.toolbar input{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}.card,.formbox{background:white;border-radius:16px;padding:20px;box-shadow:0 5px 20px #0000000b}.card img{width:100%;height:160px;object-fit:cover;border-radius:10px}.noimg{height:160px;background:#e9edf5;border-radius:10px;display:grid;place-items:center;color:#697386}.pill{display:inline-block;background:#e8edff;padding:5px 9px;border-radius:20px;font-size:12px}.formbox{max-width:700px;margin:35px auto}.formbox label{display:block;font-weight:600;margin:15px 0}.formbox input,.formbox select,.formbox textarea,.toolbar input{width:100%;padding:12px;border:1px solid #ccd3df;border-radius:9px;margin-top:7px}.formbox textarea{height:110px}.flash{max-width:1100px;margin:15px auto;padding:12px;border-radius:8px;background:#e8fff0}.danger{background:#ffe8e8}footer{text-align:center;padding:40px;color:#697386}@media(max-width:600px){.hero{padding:30px 20px}.hero h1{font-size:34px}nav{padding:15px 4%}}
+```css
+/* =========================================
+   AI LOST & FOUND
+   Modern Dashboard Design
+   ========================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   NAVIGATION
+   ========================================= */
+
+nav {
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 1px solid #e6eaf0;
+    padding: 16px 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav .brand {
+    color: #4f46e5;
+    font-size: 21px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+nav div {
+    display: flex;
+    gap: 24px;
+}
+
+nav div a {
+    color: #4b5563;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+nav div a:hover {
+    color: #4f46e5;
+}
+
+
+/* =========================================
+   MAIN
+   ========================================= */
+
+main {
+    min-height: calc(100vh - 140px);
+}
+
+
+/* =========================================
+   DASHBOARD
+   ========================================= */
+
+.dashboard-page {
+    width: min(1250px, 92%);
+    margin: auto;
+    padding: 42px 0 70px;
+}
+
+
+/* Header */
+
+.dashboard-header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border-radius: 24px;
+    padding: 38px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    box-shadow: 0 18px 40px rgba(79, 70, 229, 0.20);
+    margin-bottom: 28px;
+}
+
+.dashboard-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    opacity: 0.85;
+    margin-bottom: 7px;
+}
+
+.dashboard-header h1 {
+    font-size: 34px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.dashboard-subtitle {
+    opacity: 0.9;
+    max-width: 650px;
+    font-size: 15px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.25s;
+    border: 1px solid transparent;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-lost {
+    background: #ffffff;
+    color: #dc2626;
+}
+
+.btn-found {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.header-actions .btn-found {
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.header-actions .btn-lost:hover {
+    background: #fff1f2;
+}
+
+.header-actions .btn-found:hover {
+    background: #059669;
+}
+
+
+/* =========================================
+   STATISTICS
+   ========================================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 38px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e7ebf2;
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 7px 22px rgba(15, 23, 42, 0.05);
+    transition: 0.25s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.09);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    background: #eef2ff;
+}
+
+.stat-card span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+
+.stat-card strong {
+    font-size: 24px;
+    color: #172033;
+}
+
+.lost-card .stat-icon {
+    background: #fff1f2;
+}
+
+.found-card .stat-icon {
+    background: #ecfdf5;
+}
+
+.ai-card .stat-icon {
+    background: #f3e8ff;
+}
+
+.ai-card strong {
+    color: #7c3aed;
+}
+
+
+/* =========================================
+   REPORT SECTION
+   ========================================= */
+
+.reports-section {
+    margin-top: 10px;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 20px;
+}
+
+.section-label {
+    color: #6366f1;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.section-heading h2 {
+    font-size: 27px;
+    margin-top: 2px;
+}
+
+.report-count {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================
+   REPORT CARDS
+   ========================================= */
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.report-card {
+    background: #ffffff;
+    border: 1px solid #e5eaf1;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.055);
+    transition: 0.25s;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.11);
+}
+
+
+/* Card top */
+
+.report-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 17px 18px 12px;
+}
+
+.type-badge,
+.status-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 20px;
+}
+
+.badge-lost {
+    color: #dc2626;
+    background: #fff1f2;
+}
+
+.badge-found {
+    color: #059669;
+    background: #ecfdf5;
+}
+
+.status-badge {
+    color: #64748b;
+    background: #f1f5f9;
+}
+
+
+/* Image */
+
+.report-image {
+    height: 190px;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+.report-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+}
+
+.no-image span {
+    font-size: 42px;
+    margin-bottom: 6px;
+}
+
+
+/* Content */
+
+.report-content {
+    padding: 19px;
+}
+
+.report-content h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #172033;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+}
+
+.detail-row span {
+    color: #64748b;
+}
+
+.detail-row strong {
+    color: #334155;
+    text-align: right;
+}
+
+.description {
+    margin-top: 13px;
+    font-size: 13px;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+
+/* Match button */
+
+.report-actions {
+    padding: 0 19px 19px;
+}
+
+.match-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 12px;
+    border-radius: 11px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    transition: 0.25s;
+}
+
+.match-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+}
+
+
+/* =========================================
+   EMPTY STATE
+   ========================================= */
+
+.empty-state {
+    background: white;
+    border: 2px dashed #dbe2ea;
+    border-radius: 22px;
+    text-align: center;
+    padding: 70px 25px;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    margin: 0 auto 18px;
+}
+
+.empty-state h2 {
+    font-size: 25px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #64748b;
+    max-width: 520px;
+    margin: 0 auto 22px;
+}
+
+.empty-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.empty-actions .btn-lost {
+    background: #ef4444;
+    color: white;
+}
+
+.empty-actions .btn-found {
+    background: #10b981;
+}
+
+
+/* =========================================
+   FLASH MESSAGE
+   ========================================= */
+
+.flash {
+    width: min(1250px, 92%);
+    margin: 20px auto 0;
+    padding: 13px 17px;
+    border-radius: 12px;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
+    font-size: 13px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1000px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .reports-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    nav {
+        padding: 14px 5%;
+    }
+
+    nav .brand {
+        font-size: 17px;
+    }
+
+    nav div {
+        gap: 12px;
+    }
+
+    nav div a {
+        font-size: 13px;
+    }
+
+    .dashboard-page {
+        width: 92%;
+        padding-top: 25px;
+    }
+
+    .dashboard-header {
+        padding: 27px 22px;
+        border-radius: 19px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 27px;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions .btn {
+        flex: 1;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 11px;
+    }
+
+    .stat-card {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    .stat-card strong {
+        font-size: 20px;
+    }
+
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .section-heading h2 {
+        font-size: 23px;
+    }
+}
+
+
+@media (max-width: 420px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    nav div {
+        gap: 8px;
+    }
+
+    nav div a {
+        font-size: 12px;
+    }
+
+    .report-image {
+        height: 210px;
+    }
+}
+```
