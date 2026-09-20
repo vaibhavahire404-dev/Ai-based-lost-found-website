@@ -1,1 +1,143 @@
-{% extends "base.html" %}{% block content %}<h1>Dashboard</h1><div class="grid">{% for x in items %}<div class="card"><h3>{{x['item_name']}}</h3><b>{{x['item_type']}}</b><p>{{x['category']}} | {{x['location']}}</p><p>{{x['description']}}</p><a href="/matches/{{x['id']}}">Find Matches</a></div>{% else %}<p>No reports yet.</p>{% endfor %}</div>{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>My Dashboard</h1>
+
+<p>
+Welcome,
+<b>{{ session.get('name') }}</b>
+</p>
+
+
+<div class="grid">
+
+<div class="card">
+<h3>Total Reports</h3>
+<h2>{{ total }}</h2>
+</div>
+
+<div class="card">
+<h3>Lost Reports</h3>
+<h2>{{ lost_count }}</h2>
+</div>
+
+<div class="card">
+<h3>Found Reports</h3>
+<h2>{{ found_count }}</h2>
+</div>
+
+</div>
+
+
+<div class="grid">
+
+<div class="card">
+
+<h3>Report Lost Item</h3>
+
+<a href="/report/lost">
+<button type="button">
+Report Lost
+</button>
+</a>
+
+</div>
+
+
+<div class="card">
+
+<h3>Report Found Item</h3>
+
+<a href="/report/found">
+<button type="button">
+Report Found
+</button>
+</a>
+
+</div>
+
+</div>
+
+
+<h2>My Reports</h2>
+
+
+{% for item in items %}
+
+<div class="card">
+
+<h3>
+{{ item['item_name'] }}
+</h3>
+
+<p>
+<b>Type:</b>
+{{ item['item_type'] }}
+</p>
+
+<p>
+<b>Category:</b>
+{{ item['category'] }}
+</p>
+
+<p>
+<b>Colour:</b>
+{{ item['color'] or 'Not specified' }}
+</p>
+
+<p>
+<b>Model:</b>
+{{ item['model_number'] or 'Not specified' }}
+</p>
+
+<p>
+<b>Location:</b>
+{{ item['location'] }}
+</p>
+
+<p>
+<b>Date:</b>
+{{ item['date'] }}
+</p>
+
+<p>
+{{ item['description'] }}
+</p>
+
+
+{% if item['image'] %}
+
+<img
+src="/static/uploads/{{ item['image'] }}"
+style="max-width:220px;border-radius:10px;"
+>
+
+<br><br>
+
+{% endif %}
+
+
+<a href="/matches/{{ item['id'] }}">
+
+<button type="button">
+Find AI Matches
+</button>
+
+</a>
+
+</div>
+
+{% else %}
+
+<div class="card">
+
+<p>
+You have not submitted any reports yet.
+</p>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}
