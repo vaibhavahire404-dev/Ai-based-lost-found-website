@@ -1,53 +1,101 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h2>Report {{ kind }} Item</h2>
 
-    <form method="POST" enctype="multipart/form-data">
+<div class="card">
 
-        <div>
-            <label>Item Name</label>
-            <input type="text" name="item_name" required>
-        </div>
+<h2>Report {{ kind }} Item</h2>
 
-        <div>
-            <label>Category</label>
-            <input type="text" name="category" required>
-        </div>
+<form
+    method="POST"
+    enctype="multipart/form-data"
+>
 
-        <div>
-            <label>Colour</label>
-            <input type="text" name="color" required>
-        </div>
+<label>Item Name</label>
 
-        <div>
-            <label>Model Number</label>
-            <input type="text" name="model_number">
-        </div>
+<input
+    type="text"
+    name="item_name"
+    placeholder="Example: Black Wallet"
+    required
+>
 
-        <div>
-            <label>Location</label>
-            <input type="text" name="location" required>
-        </div>
 
-        <div>
-            <label>Date</label>
-            <input type="date" name="date" required>
-        </div>
+<label>Category</label>
 
-        <div>
-            <label>Description</label>
-            <textarea name="description" rows="5" required></textarea>
-        </div>
+<input
+    type="text"
+    name="category"
+    placeholder="Example: Wallet"
+    required
+>
 
-        <div>
-            <label>Upload Image</label>
-            <input type="file" name="image" accept=".jpg,.jpeg,.png">
-        </div>
 
-        <button type="submit">Submit {{ kind }} Report</button>
+<label>Colour</label>
 
-    </form>
+<input
+    type="text"
+    name="color"
+    placeholder="Example: Black"
+    required
+>
+
+
+<label>Model Number</label>
+
+<input
+    type="text"
+    name="model_number"
+    placeholder="Example: ABC123"
+>
+
+
+<label>Location</label>
+
+<input
+    type="text"
+    name="location"
+    placeholder="Example: College Campus"
+    required
+>
+
+
+<label>Date</label>
+
+<input
+    type="date"
+    name="date"
+    required
+>
+
+
+<label>Description</label>
+
+<textarea
+    name="description"
+    rows="5"
+    placeholder="Describe the item..."
+    required
+></textarea>
+
+
+<label>Upload Image</label>
+
+<input
+    type="file"
+    name="image"
+    accept=".jpg,.jpeg,.png"
+>
+
+
+<button type="submit">
+
+Submit {{ kind }} Report
+
+</button>
+
+</form>
+
 </div>
+
 {% endblock %}
