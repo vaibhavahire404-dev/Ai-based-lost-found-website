@@ -1,1 +1,45 @@
-{% extends 'base.html' %}{% block content %}<div class="formbox"><h1>Report Lost / Found Object</h1><form method="post" enctype="multipart/form-data"><label>Report type<select name="report_type"><option>Lost</option><option>Found</option></select></label><label>Item name<input name="item_name" required placeholder="e.g. Black Wallet"></label><label>Category<select name="category"><option>Mobile</option><option>Wallet</option><option>Bag</option><option>ID Card</option><option>Book</option><option>Keys</option><option>Other</option></select></label><label>Location<input name="location" required placeholder="e.g. College Lab 2"></label><label>Date<input type="date" name="report_date" required></label><label>Description<textarea name="description" placeholder="Colour, brand, identifying marks..."></textarea></label><label>Contact<input name="contact" required placeholder="Phone/email"></label><label>Object image<input type="file" name="image" accept="image/*"></label><button class="btn" type="submit">Submit Report</button></form></div>{% endblock %}
+```html
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Report {{ kind }} Item</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div>
+            <label>Item Name</label>
+            <input type="text" name="item_name" required>
+        </div>
+
+        <div>
+            <label>Category</label>
+            <input type="text" name="category" required>
+        </div>
+
+        <div>
+            <label>Location</label>
+            <input type="text" name="location" required>
+        </div>
+
+        <div>
+            <label>Date</label>
+            <input type="date" name="date" required>
+        </div>
+
+        <div>
+            <label>Description</label>
+            <textarea name="description" rows="5" required></textarea>
+        </div>
+
+        <div>
+            <label>Upload Image</label>
+            <input type="file" name="image" accept=".jpg,.jpeg,.png">
+        </div>
+
+        <button type="submit">Submit Report</button>
+
+    </form>
+</div>
+{% endblock %}
+```
