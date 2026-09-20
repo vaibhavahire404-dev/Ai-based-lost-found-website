@@ -164,5 +164,6 @@ def admin():
     return render_template("admin.html",users=users,items=items,lost=lost,found=found)
 
 init_db()
-if __name__=="__main__":
-    app.run(debug=True)
+
+if __name__ == "__main__":
+    app.run()
