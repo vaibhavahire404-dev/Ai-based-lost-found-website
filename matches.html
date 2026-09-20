@@ -5,68 +5,112 @@
 <h1>Possible Matches</h1>
 
 <div class="card">
-    <b>{{ item['item_name'] }}</b> — {{ item['item_type'] }}
+
+<h3>
+Searching matches for:
+</h3>
+
+<b>
+{{ item['item_name'] }}
+</b>
+
+<p>
+Type: {{ item['item_type'] }}
+</p>
+
 </div>
+
 
 {% for result in results %}
 
 <div class="card">
 
-    <h3>{{ result['item']['item_name'] }}</h3>
+<h2>
+{{ result['item']['item_name'] }}
+</h2>
 
-    <p>
-        Match Score:
-        <b>{{ result['score'] }}%</b>
-    </p>
+<h3>
+Match Score:
+{{ result['score'] }}%
+</h3>
 
-    <p>
-        <b>Category:</b>
-        {{ result['item']['category'] }}
-    </p>
+<p>
+<b>Category:</b>
+{{ result['item']['category'] }}
+</p>
 
-    <p>
-        <b>Colour:</b>
-        {{ result['item']['color'] or 'Not specified' }}
-    </p>
+<p>
+<b>Colour:</b>
+{{ result['item']['color'] or 'Not specified' }}
+</p>
 
-    <p>
-        <b>Model Number:</b>
-        {{ result['item']['model_number'] or 'Not specified' }}
-    </p>
+<p>
+<b>Model Number:</b>
+{{ result['item']['model_number'] or 'Not specified' }}
+</p>
 
-    <p>
-        <b>Location:</b>
-        {{ result['item']['location'] }}
-    </p>
+<p>
+<b>Location:</b>
+{{ result['item']['location'] }}
+</p>
 
-    <p>
-        <b>Description:</b>
-        {{ result['item']['description'] }}
-    </p>
+<p>
+<b>Date:</b>
+{{ result['item']['date'] }}
+</p>
 
-    {% if result['reasons'] %}
-        <h4>Why this matched:</h4>
+<p>
+<b>Description:</b>
+{{ result['item']['description'] }}
+</p>
 
-        <ul>
-            {% for reason in result['reasons'] %}
-                <li>{{ reason }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 
-    {% if result['item']['image'] %}
-        <img
-            src="/static/uploads/{{ result['item']['image'] }}"
-            style="max-width:220px; border-radius:10px;"
-        >
-    {% endif %}
+{% if result['reasons'] %}
+
+<h4>
+Why this matched:
+</h4>
+
+<ul>
+
+{% for reason in result['reasons'] %}
+
+<li>
+{{ reason }}
+</li>
+
+{% endfor %}
+
+</ul>
+
+{% else %}
+
+<p>
+No strong matching feature found.
+</p>
+
+{% endif %}
+
+
+{% if result['item']['image'] %}
+
+<img
+src="/static/uploads/{{ result['item']['image'] }}"
+style="max-width:250px;border-radius:10px;"
+>
+
+{% endif %}
 
 </div>
 
 {% else %}
 
 <div class="card">
-    No matching items found.
+
+<p>
+No matching items found.
+</p>
+
 </div>
 
 {% endfor %}
