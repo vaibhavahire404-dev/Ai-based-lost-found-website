@@ -4,7 +4,7 @@ import sqlite3, os, uuid, cv2
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = "change-this-secret-key"
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(BASE_DIR, "lostfound.db")
 UPLOAD_DIR = os.path.join(BASE_DIR, "static", "uploads")
