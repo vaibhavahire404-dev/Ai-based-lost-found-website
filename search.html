@@ -1,1 +1,104 @@
-{% extends "base.html" %}{% block content %}<div class="card"><h2>Search Items</h2><form method="get"><input name="q" value="{{q}}" placeholder="Search item, category or location"><button>Search</button></form></div>{% for x in rows %}<div class="card"><h3>{{x['item_name']}}</h3><p>{{x['item_type']}} | {{x['category']}} | {{x['location']}}</p><a href="/matches/{{x['id']}}">Find Matches</a></div>{% endfor %}{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Search Items</h1>
+
+<div class="card">
+
+<form method="GET" action="/search">
+
+<input
+    type="text"
+    name="q"
+    value="{{ q }}"
+    placeholder="Search item, category, colour, model or location"
+>
+
+<button type="submit">
+Search
+</button>
+
+</form>
+
+</div>
+
+
+{% if q %}
+
+<h2>
+Search Results for "{{ q }}"
+</h2>
+
+{% endif %}
+
+
+{% for item in rows %}
+
+<div class="card">
+
+<h3>
+{{ item['item_name'] }}
+</h3>
+
+<p>
+<b>Type:</b>
+{{ item['item_type'] }}
+</p>
+
+<p>
+<b>Category:</b>
+{{ item['category'] }}
+</p>
+
+<p>
+<b>Colour:</b>
+{{ item['color'] or 'Not specified' }}
+</p>
+
+<p>
+<b>Model:</b>
+{{ item['model_number'] or 'Not specified' }}
+</p>
+
+<p>
+<b>Location:</b>
+{{ item['location'] }}
+</p>
+
+<p>
+{{ item['description'] }}
+</p>
+
+
+{% if item['image'] %}
+
+<img
+src="/static/uploads/{{ item['image'] }}"
+style="max-width:220px;border-radius:10px;"
+>
+
+{% endif %}
+
+
+<br>
+
+<a href="/matches/{{ item['id'] }}">
+Find Matches
+</a>
+
+</div>
+
+{% else %}
+
+<div class="card">
+
+<p>
+No items found.
+</p>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}
