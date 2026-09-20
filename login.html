@@ -1,4 +1,56 @@
-<a href="{{ url_for('login_google') }}" class="social-login google-login">
-    <span>G</span>
-    Continue with Google
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+<h2>Login</h2>
+
+<form method="POST">
+
+<label>Email</label>
+
+<input
+    type="email"
+    name="email"
+    placeholder="Enter your email"
+    required
+>
+
+<label>Password</label>
+
+<input
+    type="password"
+    name="password"
+    placeholder="Enter your password"
+    required
+>
+
+<button type="submit">
+Login
+</button>
+
+</form>
+
+
+<hr>
+
+<a href="/login/google">
+
+<button type="button">
+Continue with Google
+</button>
+
 </a>
+
+
+<p>
+Don't have an account?
+<a href="/register">
+Create Account
+</a>
+</p>
+
+</div>
+
+{% endblock %}
