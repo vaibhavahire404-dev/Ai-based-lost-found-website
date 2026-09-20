@@ -1,1 +1,119 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Lost & Found</title><style>body{font-family:Arial;margin:0;background:#f4f7fb;color:#222}nav{background:#172554;color:white;padding:14px;display:flex;gap:14px;flex-wrap:wrap}nav a{color:white;text-decoration:none;font-weight:bold}.container{max-width:1000px;margin:25px auto;padding:15px}.card{background:white;padding:18px;margin:12px 0;border-radius:12px;box-shadow:0 2px 8px #0001}input,textarea,button{width:100%;padding:11px;margin:7px 0;box-sizing:border-box;border:1px solid #ccc;border-radius:7px}button{background:#2563eb;color:white;border:0;font-weight:bold}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:15px}.flash{background:#dcfce7;padding:10px;border-radius:8px}</style></head><body><nav><a href="/">Home</a><a href="/search">Search</a>{% if session.get('uid') %}<a href="/dashboard">Dashboard</a><a href="/report/lost">Report Lost</a><a href="/report/found">Report Found</a><a href="/logout">Logout</a>{% else %}<a href="/login">Login</a><a href="/register">Register</a>{% endif %}</nav><div class="container">{% with messages=get_flashed_messages() %}{% for message in messages %}<div class="flash">{{message}}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</div></body></html>
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Lost & Found</title>
+
+<style>
+body{
+    font-family:Arial;
+    margin:0;
+    background:#f4f7fb;
+    color:#222
+}
+
+nav{
+    background:#172554;
+    color:white;
+    padding:14px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    font-weight:bold
+}
+
+.container{
+    max-width:1000px;
+    margin:25px auto;
+    padding:15px
+}
+
+.card{
+    background:white;
+    padding:18px;
+    margin:12px 0;
+    border-radius:12px;
+    box-shadow:0 2px 8px #0001
+}
+
+input,textarea,button{
+    width:100%;
+    padding:11px;
+    margin:7px 0;
+    box-sizing:border-box;
+    border:1px solid #ccc;
+    border-radius:7px
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:0;
+    font-weight:bold
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:15px
+}
+
+.flash{
+    background:#dcfce7;
+    padding:10px;
+    border-radius:8px
+}
+
+footer{
+    text-align:center;
+    padding:25px 10px;
+    margin-top:40px;
+    color:#555;
+    font-size:14px;
+}
+</style>
+
+</head>
+
+<body>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/search">Search</a>
+
+    {% if session.get('uid') %}
+        <a href="/dashboard">Dashboard</a>
+        <a href="/report/lost">Report Lost</a>
+        <a href="/report/found">Report Found</a>
+        <a href="/logout">Logout</a>
+    {% else %}
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+    {% endif %}
+</nav>
+
+<div class="container">
+
+    {% with messages=get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="flash">{{message}}</div>
+        {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+</div>
+
+<footer>
+    AI-Based Lost & Found Object Matching System<br>
+    Developed by <b>Vaibhav Ahire</b><br>
+    Diploma Project 2026-27
+</footer>
+
+</body>
+</html>
